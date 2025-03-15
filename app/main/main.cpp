@@ -32,7 +32,7 @@ int main()
 
     while (true) {
         if (interrupt) {
-            auto const& [x, y, z] = adxl345.get_acceleration_scaled();
+            auto const& [x, y, z] = adxl345.get_acceleration_scaled().value();
             std::printf("acceleration x: %f, y: %f, z: %f\n\r", x, y, z);
             interrupt = false;
         }

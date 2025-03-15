@@ -15,24 +15,28 @@ namespace ADXL345 {
         this->deinitialize();
     }
 
-    float ADXL345::get_acceleration_x_scaled() const noexcept
+    std::optional<float> ADXL345::get_acceleration_x_scaled() const noexcept
     {
-        return static_cast<float>(this->get_acceleration_x_raw()) * this->scale_;
+        return this->get_acceleration_x_raw().transform(
+            [this](std::int16_t const raw) { return static_cast<float>(raw) * this->scale_; });
     }
 
-    float ADXL345::get_acceleration_y_scaled() const noexcept
+    std::optional<float> ADXL345::get_acceleration_y_scaled() const noexcept
     {
-        return static_cast<float>(this->get_acceleration_y_raw()) * this->scale_;
+        return this->get_acceleration_y_raw().transform(
+            [this](std::int16_t const raw) { return static_cast<float>(raw) * this->scale_; });
     }
 
-    float ADXL345::get_acceleration_z_scaled() const noexcept
+    std::optional<float> ADXL345::get_acceleration_z_scaled() const noexcept
     {
-        return static_cast<float>(this->get_acceleration_z_raw()) * this->scale_;
+        return this->get_acceleration_z_raw().transform(
+            [this](std::int16_t const raw) { return static_cast<float>(raw) * this->scale_; });
     }
 
-    Vec3D<float> ADXL345::get_acceleration_scaled() const noexcept
+    std::optional<Vec3D<float>> ADXL345::get_acceleration_scaled() const noexcept
     {
-        return static_cast<Vec3D<float>>(this->get_acceleration_scaled()) * this->scale_;
+        return this->get_acceleration_raw().transform(
+            [this](Vec3D<std::int16_t> const& raw) { return static_cast<Vec3D<float>>(raw) * this->scale_; });
     }
 
     std::uint8_t ADXL345::read_byte(std::uint8_t const reg_address) const noexcept
@@ -89,27 +93,37 @@ namespace ADXL345 {
         return std::bit_cast<std::uint8_t>(this->get_devid_register());
     }
 
-    std::int16_t ADXL345::get_acceleration_x_raw() const noexcept
+    std::optional<std::int16_t> ADXL345::get_acceleration_x_raw() const noexcept
     {
-        return std::bit_cast<std::int16_t>(this->get_data_x_registers());
+        return this->initialized_ ? std::optional<std::int16_t>{std::byteswap(
+                                        std::bit_cast<std::int16_t>(this->get_data_x_registers()))}
+                                  : std::optional<std::int16_t>{std::nullopt};
     }
 
-    std::int16_t ADXL345::get_acceleration_y_raw() const noexcept
+    std::optional<std::int16_t> ADXL345::get_acceleration_y_raw() const noexcept
     {
-        return std::bit_cast<std::int16_t>(this->get_data_y_registers());
+        return this->initialized_ ? std::optional<std::int16_t>{std::byteswap(
+                                        std::bit_cast<std::int16_t>(this->get_data_y_registers()))}
+                                  : std::optional<std::int16_t>{std::nullopt};
     }
 
-    std::int16_t ADXL345::get_acceleration_z_raw() const noexcept
+    std::optional<std::int16_t> ADXL345::get_acceleration_z_raw() const noexcept
     {
-        return std::bit_cast<std::int16_t>(this->get_data_z_registers());
+        return this->initialized_ ? std::optional<std::int16_t>{std::byteswap(
+                                        std::bit_cast<std::int16_t>(this->get_data_z_registers()))}
+                                  : std::optional<std::int16_t>{std::nullopt};
     }
 
-    Vec3D<std::int16_t> ADXL345::get_acceleration_raw() const noexcept
+    std::optional<Vec3D<std::int16_t>> ADXL345::get_acceleration_raw() const noexcept
     {
         auto const data = this->get_data_registers();
-        return Vec3D<std::int16_t>{std::byteswap(std::bit_cast<std::int16_t>(data.data_x)),
-                                   std::byteswap(std::bit_cast<std::int16_t>(data.data_y)),
-                                   std::byteswap(std::bit_cast<std::int16_t>(data.data_z))};
+        return this->initialized_
+                   ? std::optional<Vec3D<std::int16_t>>{std::in_place,
+                                                        std::byteswap(std::bit_cast<std::int16_t>(data.data_x)),
+                                                        std::byteswap(std::bit_cast<std::int16_t>(data.data_y)),
+                                                        std::byteswap(std::bit_cast<std::int16_t>(data.data_z))}
+                   : std::optional<Vec3D<std::int16_t>>{std::nullopt};
+        ;
     }
 
     DEVID ADXL345::get_devid_register() const noexcept

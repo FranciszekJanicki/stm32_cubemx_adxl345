@@ -22,10 +22,10 @@ namespace ADXL345 {
 
         ~ADXL345() noexcept;
 
-        float get_acceleration_x_scaled() const noexcept;
-        float get_acceleration_y_scaled() const noexcept;
-        float get_acceleration_z_scaled() const noexcept;
-        Vec3D<float> get_acceleration_scaled() const noexcept;
+        std::optional<float> get_acceleration_x_scaled() const noexcept;
+        std::optional<float> get_acceleration_y_scaled() const noexcept;
+        std::optional<float> get_acceleration_z_scaled() const noexcept;
+        std::optional<Vec3D<float>> get_acceleration_scaled() const noexcept;
 
     private:
         std::uint8_t read_byte(std::uint8_t const reg_address) const noexcept;
@@ -46,10 +46,10 @@ namespace ADXL345 {
 
         std::uint8_t get_device_id() const noexcept;
 
-        std::int16_t get_acceleration_x_raw() const noexcept;
-        std::int16_t get_acceleration_y_raw() const noexcept;
-        std::int16_t get_acceleration_z_raw() const noexcept;
-        Vec3D<std::int16_t> get_acceleration_raw() const noexcept;
+        std::optional<std::int16_t> get_acceleration_x_raw() const noexcept;
+        std::optional<std::int16_t> get_acceleration_y_raw() const noexcept;
+        std::optional<std::int16_t> get_acceleration_z_raw() const noexcept;
+        std::optional<Vec3D<std::int16_t>> get_acceleration_raw() const noexcept;
 
         DEVID get_devid_register() const noexcept;
 
